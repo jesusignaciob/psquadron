@@ -1,21 +1,26 @@
 class Suelo extends Entidad {
   PImage suelo;
+  PImage relieve;
+  
+  int np;
   
   // But we also have to make a body for box2d to know about it
   Body body;
 
-  Suelo(PImage _suelo, float _x,float _y, float _ancho, float _alto) {
+  Suelo(PImage _suelo, int _np, float _x, float _y, float _ancho, float _alto) {
     super(_x, _y, _ancho, _alto);
     
     suelo = _suelo;
+    np = _np < 1 ? 1 : _np;
     
     makeBody();
   }
   
-  Suelo(PImage _suelo, float _x,float _y) {
+  Suelo(PImage _suelo, int _np, float _x, float _y) {
     super(_x, _y, _suelo.width, _suelo.height);
     
     suelo = _suelo;
+    np = _np < 1 ? 1 : _np;
     
     makeBody();
   }
@@ -52,6 +57,10 @@ class Suelo extends Entidad {
 
   // Draw the boundary, if it were at an angle we'd have to do something fancier
   void display() {
-    image(suelo, x, y);
+    float rep = 0;
+    for (int i = 0; i < np; i++) {
+      image(suelo, rep, y);
+      rep += ancho;
+    }
   }
 }

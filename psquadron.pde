@@ -15,15 +15,17 @@ import fullscreen.*;
 FullScreen fs;
 
 float x, y; 
-float posy_ant, cambioDeSprite = 7, dx, speed;
-PImage a, bg, piSuelo, montana, montana2;  // tipo de variable para guardar la imagen en memoria
-PImage[] images, radardome, torre, tiposNube = null, tiposArbol = null;
+float posy_ant, cambioDeSprite, dx, speed;
+PImage bg, piSuelo;  // tipo de variable para guardar la imagen en memoria
+PImage[] images, radardome, torre, tiposNube = null, tiposArbol = null, tiposMontana = null;
 
-int cantidadArboles = 20, cantidadNubes = 20;
+int cantidadArboles, cantidadNubes, cantidadCordilleras, np;
 
+Aeronave nave = null;
 Cielo cielo = null;
 Suelo suelo = null;
 Bosque bosque = null;
+Relieve relieve = null;
 Edificacion edifRadardome = null, edifTorre = null;
 
 PBox2D box2d;
@@ -44,37 +46,29 @@ void setup() {
   //fs.enter(); 
   
   //Inicializacion del Motor de Fisica
-  box2d = new PBox2D(this);	
-  box2d.createWorld();
-  
-  // We are setting a custom gravity
-  box2d.setGravity(0, -9.8);
-  
-  // Turn on collision listening!
-  box2d.listenForCollisions();
+  inicializarMotorDeFisica();
   
   //Inicializacion de variables
-  x = 0;
-  y = height/2.0;
-  posy_ant = 0;
-  speed = 5;
+  inicializarVariables();
   
-  addAllSprites();
+  agregarTodosSprites();
   
   // Create ArrayLists
   bombas = new ArrayList<Bomba>();
   
-  a = images[0];  // cargo la imagen desde una ubicacion a memoria
+  suelo = new Suelo(piSuelo, np, 0, 512);
   
-  suelo = new Suelo(piSuelo, 0, 512);
+  relieve = new Relieve(tiposMontana, cantidadCordilleras, 0, 400, tiposMontana[0].width, tiposMontana[0].height);
   
   edifRadardome = new Edificacion(radardome, 900, 512, radardome[0].width, radardome[0].height, 0.5);
   
   edifTorre = new Edificacion(torre, 700, 512, torre[0].width, torre[0].height, 0.5);
   
-  cielo = new Cielo(bg, tiposNube, cantidadNubes, 0, 0, width, 300);
+  cielo = new Cielo(bg, tiposNube, cantidadNubes, np, 0, 0, width, 300);
   
   bosque = new Bosque(tiposArbol, cantidadArboles, 0, 0, 600, 100);
+  
+  nave = new Aeronave(images, x, y);
   
   bombas = new ArrayList<Bomba>();
   
@@ -93,31 +87,22 @@ void draw() {
   //para manejar el evento presionar mouse y que tipo de boton se presiono, boton derecho: sube la nave, boton izquierdo: baja la nave
   if (mousePressed) {
     if (mouseButton == LEFT)
-      y -= 5;
+      nave.mover(Movimiento.ARRIBA);
     else {
-      y += 5;
-      if (posy_ant <= cambioDeSprite) {
-        a = images[1];
-        posy_ant ++;
-      }
-      else
-        a = images[2];
+      nave.mover(Movimiento.ABAJO);
     }
   }
   
   cielo.display(-dx*0.2);
   
-  image(montana, 0, 400);
-  image(montana, 700, 400);
-  image(montana2, 1400, 400);
-  
+  relieve.display(0);
   suelo.display();
-  
-  image(a, x, y); // aeronave
   
   if (keyPressed) {
     teclaPresionada();
   }
+  
+  nave.display(dx); //Aeronave
   
   bosque.display(-dx*0.4);
   
@@ -143,9 +128,9 @@ void draw() {
 void teclaPresionada() {
   if (key == CODED) {
     if (keyCode == LEFT)
-      x -= 5;
+      nave.mover(Movimiento.DERECHA);
     else if (keyCode == RIGHT)
-      x += 5;
+      nave.mover(Movimiento.IZQUIERDA);
   }
 }
 
@@ -178,23 +163,47 @@ void endContact(Contact cp) {
 void keyPressed() {
   if (key == CODED) {
     if (keyCode == ALT) {  
-      bomba = new Bomba(spriteBomba, 0, "Bomba 1", x + a.width/2, y + a.height, 1);
+      bomba = new Bomba(spriteBomba, 0, "Bomba 1", x + nave.ancho/2, y + nave.alto, 1);
       bombas.add(bomba);
     }
   }
 }
 
 void mouseReleased() {
-  a = images[0];
-  posy_ant = 0;
+  nave.mover(Movimiento.QUIETO);
 }
 
-void addAllSprites() {
+void inicializarVariables() {
+  x = 0;
+  y = height/2.0;
+  posy_ant = 0;
+  speed = 5;
+  np = 4;
+  cambioDeSprite = 7;
+  cantidadArboles = 20;
+  cantidadNubes = 20;
+  cantidadCordilleras = 20;
+}
+
+void inicializarMotorDeFisica() {
+  box2d = new PBox2D(this);	
+  box2d.createWorld();
+  
+  // We are setting a custom gravity
+  box2d.setGravity(0, -9.8);
+  
+  // Turn on collision listening!
+  box2d.listenForCollisions();
+}
+
+void agregarTodosSprites() {
   bg = loadImage("base_cielo.png");
   piSuelo = loadImage("base_suelo.png");
   
-  montana = loadImage("montana.png");
-  montana2 = loadImage("montana2.png");
+  tiposMontana = new PImage[2];
+  
+  tiposMontana[0] = loadImage("montana.png");
+  tiposMontana[1] = loadImage("montana2.png");
   
   tiposNube = new PImage[3];
   tiposNube[0] = loadImage("nube1_v2.png");
