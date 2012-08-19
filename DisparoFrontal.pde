@@ -1,6 +1,6 @@
-class Bomba extends Arma{
+class DisparoFrontal extends Arma {
   
-  Bomba(PImage _sprite, int _id, String _nombre, float _x, float _y, int _ancho, int _alto, int _dano) {
+  DisparoFrontal(PImage _sprite, int _id, String _nombre, float _x, float _y, int _ancho, int _alto, int _dano) {
     super(_id, _nombre, _x, _y, _ancho, _alto, _dano);
     
     sprite = _sprite;
@@ -8,7 +8,7 @@ class Bomba extends Arma{
     makeBody();
   }
   
-  Bomba(PImage _sprite, int _id, String _nombre, float _x, float _y, int _dano) {
+  DisparoFrontal(PImage _sprite, int _id, String _nombre, float _x, float _y, int _dano) {
     super(_id, _nombre, _x, _y, _sprite.width, _sprite.height, _dano);
     
     sprite = _sprite;
@@ -42,12 +42,12 @@ class Bomba extends Arma{
     body.createFixture(fd);
     
     // Give it some initial random velocity
-    body.setLinearVelocity(new Vec2(3, -70));
+    body.setLinearVelocity(new Vec2(100, -70));
     body.setAngularVelocity(-1);
     
     body.setUserData(this);
   }
-    
+  
   void display() {
     // We need the Body’s location and angle
     Vec2 pos = box2d.getBodyPixelCoord(body);		

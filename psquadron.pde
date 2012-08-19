@@ -1,10 +1,21 @@
+//Libreria para el manejo de la Fisica
 import pbox2d.*;
 import org.jbox2d.collision.shapes.*;
 import org.jbox2d.common.*;
 import org.jbox2d.dynamics.*;
 import org.jbox2d.dynamics.contacts.*;
 
-float y, posy_ant, cambioDeSprite = 7, x;
+//Libreria para el manejo de OpenGL
+import processing.opengl.*;
+import codeanticode.glgraphics.*;
+
+//Libreria para el manejo de las resoluciones
+import fullscreen.*;
+
+FullScreen fs;
+
+float x, y; 
+float posy_ant, cambioDeSprite = 7, dx, speed;
 PImage a, bg, piSuelo, montana, montana2;  // tipo de variable para guardar la imagen en memoria
 PImage[] images, radardome, torre, tiposNube = null, tiposArbol = null;
 
@@ -23,8 +34,14 @@ Bomba bomba = null;
 ArrayList<Bomba> bombas = null;
 
 void setup() {
-  size(1600,662);
-  smooth();
+  size(1600,662, GLConstants.GLGRAPHICS);
+  //smooth();
+  
+  // Create the fullscreen object
+  //fs = new FullScreen(this); 
+  
+  // enter fullscreen mode
+  //fs.enter(); 
   
   //Inicializacion del Motor de Fisica
   box2d = new PBox2D(this);	
@@ -40,57 +57,28 @@ void setup() {
   x = 0;
   y = height/2.0;
   posy_ant = 0;
+  speed = 5;
+  
+  addAllSprites();
   
   // Create ArrayLists
   bombas = new ArrayList<Bomba>();
   
-  images = new PImage[3];
-  
-  images[0] = loadImage("example.png");
-  images[1] = loadImage("example2.png");
-  images[2] = loadImage("example3.png");
-  
   a = images[0];  // cargo la imagen desde una ubicacion a memoria
-  bg = loadImage("base_cielo.png");
   
-  piSuelo = loadImage("base_suelo.png");
-  suelo = new Suelo(piSuelo, 0, 512, piSuelo.width, piSuelo.height);
-  
-  radardome = new PImage[3];
-  radardome[0] = loadImage("radardome1.png");
-  radardome[1] = loadImage("radardome2.png");
-  radardome[2] = loadImage("radardome3.png");
+  suelo = new Suelo(piSuelo, 0, 512);
   
   edifRadardome = new Edificacion(radardome, 900, 512, radardome[0].width, radardome[0].height, 0.5);
   
-  torre = new PImage[3];
-  torre[0] = loadImage("enemy1_1.png");
-  torre[1] = loadImage("enemy1_2.png");
-  torre[2] = loadImage("enemy1_3.png");
-  
   edifTorre = new Edificacion(torre, 700, 512, torre[0].width, torre[0].height, 0.5);
-  
-  montana = loadImage("montana.png");
-  montana2 = loadImage("montana2.png");
-  
-  tiposNube = new PImage[3];
-  tiposNube[0] = loadImage("nube1_v2.png");
-  tiposNube[1] = loadImage("nube2_v2.png");
-  tiposNube[2] = loadImage("nube3_v2.png");
   
   cielo = new Cielo(bg, tiposNube, cantidadNubes, 0, 0, width, 300);
   
-  tiposArbol = new PImage[2];
-  tiposArbol[0] = loadImage("arbol1.png");
-  tiposArbol[1] = loadImage("arbol2.png");
-  
   bosque = new Bosque(tiposArbol, cantidadArboles, 0, 0, 600, 100);
-  
-  spriteBomba = loadImage("bomba.png");
   
   bombas = new ArrayList<Bomba>();
   
-  frameRate(30);
+  frameRate(60);
 }
 
 void draw() {
@@ -117,7 +105,7 @@ void draw() {
     }
   }
   
-  cielo.display();
+  cielo.display(-dx*0.2);
   
   image(montana, 0, 400);
   image(montana, 700, 400);
@@ -125,29 +113,31 @@ void draw() {
   
   suelo.display();
   
-  //image(suelo, 0, 512); //suelo
-  
   image(a, x, y); // aeronave
   
   if (keyPressed) {
     teclaPresionada();
   }
   
-  bosque.display();
+  bosque.display(-dx*0.4);
   
-  if (edifTorre.estaDestruido())
+  /*if (edifTorre.estaDestruido())
     edifTorre.matarCuerpo();
-  else
+  else*/
     edifTorre.display();
   
-  if (edifRadardome.estaDestruido())
+  /*if (edifRadardome.estaDestruido())
     edifRadardome.matarCuerpo();
-  else
+  else*/
     edifRadardome.display();
       
   for (Bomba b: bombas) {
     b.display();
   }
+  
+  dx += speed/60;
+  
+  camera(width/2.0 + dx, height/2.0, (height/2.0) / tan(PI*60.0 / 360.0), width/2.0 + dx, height/2.0, 0, 0, 1, 0);
 }
 
 void teclaPresionada() {
@@ -176,6 +166,8 @@ void beginContact(Contact cp) {
     Bomba b = (Bomba)o2;
     Edificacion e = (Edificacion)o1;
     e.recibirDano(b.obtenerDano());
+    
+    //Explosion explosion = new Explosion();
   }
 }
 
@@ -186,7 +178,7 @@ void endContact(Contact cp) {
 void keyPressed() {
   if (key == CODED) {
     if (keyCode == ALT) {  
-      bomba = new Bomba(spriteBomba, 0, "Bomba 1", x + a.width/2, y + a.height, spriteBomba.width, spriteBomba.height, 1);
+      bomba = new Bomba(spriteBomba, 0, "Bomba 1", x + a.width/2, y + a.height, 1);
       bombas.add(bomba);
     }
   }
@@ -195,4 +187,39 @@ void keyPressed() {
 void mouseReleased() {
   a = images[0];
   posy_ant = 0;
+}
+
+void addAllSprites() {
+  bg = loadImage("base_cielo.png");
+  piSuelo = loadImage("base_suelo.png");
+  
+  montana = loadImage("montana.png");
+  montana2 = loadImage("montana2.png");
+  
+  tiposNube = new PImage[3];
+  tiposNube[0] = loadImage("nube1_v2.png");
+  tiposNube[1] = loadImage("nube2_v2.png");
+  tiposNube[2] = loadImage("nube3_v2.png");
+  
+  tiposArbol = new PImage[2];
+  tiposArbol[0] = loadImage("arbol1.png");
+  tiposArbol[1] = loadImage("arbol2.png");
+  
+  images = new PImage[3];
+  
+  images[0] = loadImage("example.png");
+  images[1] = loadImage("example2.png");
+  images[2] = loadImage("example3.png");
+  
+  radardome = new PImage[3];
+  radardome[0] = loadImage("radardome1.png");
+  radardome[1] = loadImage("radardome2.png");
+  radardome[2] = loadImage("radardome3.png");
+  
+  torre = new PImage[3];
+  torre[0] = loadImage("enemy1_1.png");
+  torre[1] = loadImage("enemy1_2.png");
+  torre[2] = loadImage("enemy1_3.png");
+  
+  spriteBomba = loadImage("bomba.png");
 }

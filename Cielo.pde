@@ -34,11 +34,15 @@ class Cielo {
     }
   }
   
-  void display()
+  void display(float speedx)
   {
     image(horizonte, 0, 0);
     
-    for (int i = 0; i < cantidadNubes; i++)
-      nubes[i].display();
+    pushMatrix();
+      translate(speedx, 0);
+      rectMode(CORNER);
+      for (int i = 0; i < cantidadNubes; i++)
+        nubes[i].display(0);
+    popMatrix();
   }
 }

@@ -3,8 +3,7 @@ class Arma extends Entidad {
   String nombre;
   
   int dano;
-  PImage[] anim_fase1, anim_fase2;
-  int posy_ant, cambSprf1;
+  PImage sprite;
   
   //  Instead of any of the usual variables, we will store a reference to a Box2D Body
   Body body;

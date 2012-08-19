@@ -26,9 +26,13 @@ class Bosque extends Entidad {
     }
   }
   
-  void display()
-  { 
-    for (int i = 0; i < cantidadArboles; i++)
-      arboles[i].display();
+  void display(float speedx)
+  {
+    pushMatrix();
+      translate(speedx, 0);
+      rectMode(CORNER);
+      for (int i = 0; i < cantidadArboles; i++)
+        arboles[i].display(0);
+    popMatrix();
   }
 }

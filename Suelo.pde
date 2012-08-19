@@ -8,7 +8,19 @@ class Suelo extends Entidad {
     super(_x, _y, _ancho, _alto);
     
     suelo = _suelo;
-
+    
+    makeBody();
+  }
+  
+  Suelo(PImage _suelo, float _x,float _y) {
+    super(_x, _y, _suelo.width, _suelo.height);
+    
+    suelo = _suelo;
+    
+    makeBody();
+  }
+  
+  void makeBody() {
     // Define the polygon
     PolygonShape sd = new PolygonShape();
     // Figure out the box2d coordinates
@@ -40,8 +52,6 @@ class Suelo extends Entidad {
 
   // Draw the boundary, if it were at an angle we'd have to do something fancier
   void display() {
-    //rect(x,y,ancho,alto);
-    //image(suelo, x, y);
     image(suelo, x, y);
   }
 }

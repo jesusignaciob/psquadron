@@ -10,8 +10,8 @@ class Nube {
     y = pos_y;
   }
   
-  void display()
+  void display(float speedx)
   {
-    image(imagenNube, x, y);
+    image(imagenNube, x + speedx, y);
   }
 }
