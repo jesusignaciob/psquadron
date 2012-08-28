@@ -2,36 +2,42 @@ class Relieve extends Entidad {
   Cordillera[] montanas;
   int cantidadCordilleras;
   
-  Relieve(PImage[] tiposMontana, int cantidad, float _x, float _y, float _ancho, float _alto) {
-    super(_x, _y, _ancho, _alto);
+  Relieve(PApplet applet, Entidad[] tiposMontana, int cantidad, float _x, float _y) {
+    super(_x, _y, 0, 0);
     
     cantidadCordilleras = cantidad;
     
-    generadorArboles(tiposMontana);
+    generadorArboles(applet, tiposMontana);
   }
   
-  void generadorArboles(PImage[] tiposMontana)
+  void generadorArboles(PApplet applet, Entidad[] tiposMontana)
   {
     int tipoMontana, cantidadTipos = tiposMontana.length;
-    float pos_x, pos_y;
     montanas = new Cordillera[cantidadCordilleras];
     
     float rep = 0;
     for (int i = 0; i < cantidadCordilleras; i++) {
       tipoMontana = round(random(cantidadTipos - 1));
-      montanas[i] = new Cordillera(tiposMontana[tipoMontana], rep, y);
       
-      rep += ancho;
+      String path = tiposMontana[tipoMontana].path;
+      float _ancho = tiposMontana[tipoMontana].ancho;
+      float _alto = tiposMontana[tipoMontana].alto;
+      
+      montanas[i] = new Cordillera(applet, path, rep, y, _ancho, _alto);
+      
+      rep += _ancho;
     }
   }
   
   void display(float speedx)
-  {
-    pushMatrix();
-      translate(speedx, 0);
-      rectMode(CORNER);
-      for (int i = 0; i < cantidadCordilleras; i++)
-        montanas[i].display();
-    popMatrix();
+  { 
+    GLGraphics renderer = (GLGraphics)g;
+    renderer.beginGL();
+    
+    for (int i = 0; i < cantidadCordilleras; i++)
+      montanas[i].display(renderer, speedx);
+      
+    renderer.endGL();
   }
 }
+

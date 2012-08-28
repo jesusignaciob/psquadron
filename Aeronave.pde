@@ -14,21 +14,20 @@ class Aeronave extends Entidad {
   int posy_ant;
   int estado;
   
-  Aeronave(PImage[] _aeronave, float _x, float _y, float _ancho, float _alto) {
+  Aeronave(String[] _aeronave, float _x, float _y, float _ancho, float _alto) {
     super(_x, _y, _ancho, _alto);
     
-    aeronave = _aeronave;
+    int longitud = _aeronave.length;
+    aeronave = new PImage[longitud];
+    
+    for (int i = 0; i <  longitud; i++)
+      aeronave[i] = loadImage(_aeronave[i]);
+    
     armas = new HashMap();
     
     posy_ant = 0;
     cambioDeSprite = 7;
     estado = 0;
-  }
-  
-  Aeronave(PImage[] _aeronave, float _x, float _y) {
-    super(_x, _y, _aeronave[0].width, _aeronave[0].height);
-    
-    aeronave = _aeronave;
   }
   
   void anadirArma(Arma arma) {
@@ -42,10 +41,12 @@ class Aeronave extends Entidad {
   void mover(int dir) {
     switch(dir) {
       case 0:
-        y -= 5;
+        if (y >= 5)
+          y -= 5;
         break;
       case 2:
-        y += 5;
+        if (y < 450)
+          y += 5;
         if (posy_ant <= cambioDeSprite) {
           estado = 1;
           posy_ant ++;
@@ -54,10 +55,12 @@ class Aeronave extends Entidad {
           estado = 2;
         break;
       case 3:
-        x += 5;
+        if (x < width - ancho)
+          x += 5;
         break;
       case 1:
-        x -= 5;
+        if (x > 0)
+          x -= 5;
         break;
       default:
         estado = 0;
@@ -69,3 +72,4 @@ class Aeronave extends Entidad {
     image(aeronave[estado], x + dx, y); // aeronave
   }
 }
+

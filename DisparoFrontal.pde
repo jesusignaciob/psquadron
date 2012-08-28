@@ -61,3 +61,4 @@ class DisparoFrontal extends Arma {
     popMatrix();
   }
 }
+

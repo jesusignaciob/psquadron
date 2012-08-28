@@ -17,3 +17,4 @@ class Explosion extends Entidad {
     image(sprites[frame++], x, y);
   }
 }
+
